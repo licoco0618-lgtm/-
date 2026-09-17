@@ -1,761 +1,375 @@
 <!DOCTYPE html>
-<html lang="zh-TW" data-theme="dark">
+<html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="資處一仁學藝 班級事務管理系統 - 專為高職資料處理科學藝股長設計的教室日誌、作業催繳、課表小老師、考試倒數與黑板每日一句管理工作站。">
-  <title>資處一仁學藝 | 班級事務管理工作站</title>
-  
-  <!-- CSS 樣式表 -->
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/print.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+  <title>學藝股長智慧班級工作台 (31人)</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
-
   <div class="app-container">
-    
-    <!-- 頂部 Header -->
+    <!-- Top Header -->
     <header class="main-header">
-      <div class="brand-section">
-        <div class="brand-logo-badge">📊</div>
-        <div class="brand-titles">
-          <h1 class="main-title">
-            <span id="appMainTitle">資處一仁學藝</span>
-            <span class="title-tag" id="headerWeekBadge">第 3 週</span>
-          </h1>
-          <span class="sub-title" id="appSubTitle">資料處理科 一年仁班 • 班級事務管理工作站</span>
+      <div class="logo-area">
+        <div class="badge-avatar">📚</div>
+        <div>
+          <div class="header-badge-row">
+            <span class="role-tag">學藝股長專用系統</span>
+            <span class="class-tag">115學年第1學期 資處一仁</span>
+            <span class="date-badge" id="currentDateBadge">2026年9月17日 星期四</span>
+          </div>
+          <h1>學藝股長智慧班級工作台</h1>
+          <p class="subtitle">班級：<strong>資處一仁</strong> ｜ 全班人數：<strong>31</strong> 人 ｜ 號碼：1 ～ 31 號</p>
         </div>
       </div>
-
       <div class="header-actions">
-        <!-- 即時時鐘 -->
-        <div class="live-clock-card">
-          <span class="clock-icon">⏰</span>
-          <div class="clock-info">
-            <span class="live-time" id="headerLiveClock">--:--:--</span>
-            <span class="live-date" id="headerLiveDate">讀取中...</span>
-          </div>
-        </div>
-
-        <!-- 輔助工具按鈕 -->
-        <div class="header-tools">
-          <button class="icon-btn" id="btnToggleSound" title="音效切換">🔊</button>
-          <button class="icon-btn" id="btnToggleTheme" title="深淺主題切換">🌙</button>
-        </div>
+        <button id="themeToggleBtn" class="btn-icon" title="切換深淺模式">🌓</button>
+        <button id="soundToggleBtn" class="btn-icon active" title="開關音效">🔊</button>
+        <button id="fullscreenBtn" class="btn-icon" title="全螢幕投影">🖥️</button>
       </div>
     </header>
 
-    <!-- 主導覽分頁列 -->
-    <nav class="main-nav-bar">
-      <button class="nav-tab-item active" data-tab="dashboard">
-        <span class="tab-icon">📋</span>
-        <span>每日聯絡簿 & 日誌</span>
-      </button>
-      <button class="nav-tab-item" data-tab="homework">
-        <span class="tab-icon">📝</span>
-        <span>作業登記與催繳盤</span>
-      </button>
-      <button class="nav-tab-item" data-tab="exams">
-        <span class="tab-icon">⏰</span>
-        <span>小考與段考倒數</span>
-      </button>
-      <button class="nav-tab-item" data-tab="schedule">
-        <span class="tab-icon">📅</span>
-        <span>課表與各科小老師</span>
-      </button>
-      <button class="nav-tab-item" data-tab="quotes">
-        <span class="tab-icon">✨</span>
-        <span>黑板金句 & 教室佈置</span>
-      </button>
-      <button class="nav-tab-item" data-tab="roster">
-        <span class="tab-icon">👥</span>
-        <span>座號名冊與設定</span>
-      </button>
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="homeworkTab">📝 作業催繳登記</button>
+      <button class="tab-btn" data-tab="scheduleTab">📅 資處一仁課表</button>
+      <button class="tab-btn" data-tab="boardTab">📢 電子黑板 / 聯絡簿</button>
+      <button class="tab-btn" data-tab="logTab">📋 教室日誌小幫手</button>
+      <button class="tab-btn" data-tab="lotteryTab">🎲 課堂抽籤 / 點名</button>
+      <button class="tab-btn" data-tab="staffTab">👥 座號與小老師</button>
     </nav>
 
-    <!-- 總覽數據小卡 (在首頁顯示) -->
-    <div class="dashboard-stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon-wrapper">📝</div>
-        <div class="stat-details">
-          <span class="stat-title">進行中作業</span>
-          <span class="stat-number" id="dashHwCount">-- 項</span>
-        </div>
-      </div>
+    <!-- Main Content Area -->
+    <main class="content-area">
 
-      <div class="stat-card stat-urgent">
-        <div class="stat-icon-wrapper">🚨</div>
-        <div class="stat-details">
-          <span class="stat-title">全班缺交人次</span>
-          <span class="stat-number" id="dashMissingCount">-- 人次</span>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon-wrapper">⏳</div>
-        <div class="stat-details">
-          <span class="stat-title">下次大考倒數</span>
-          <span class="stat-number" id="dashExamDays">-- 天</span>
-        </div>
-      </div>
-
-      <div class="stat-card stat-success">
-        <div class="stat-icon-wrapper">🧑‍💼</div>
-        <div class="stat-details">
-          <span class="stat-title">班務執勤中</span>
-          <span class="stat-number" id="headerCadreName">導師：翁偉倬</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ==========================================================================
-         視圖 1: 📋 每日聯絡簿 & 教室日誌 (Dashboard / Daily Log)
-         ========================================================================== -->
-    <section class="view-section active-view" id="view-dashboard">
-      <div class="glass-panel">
-        <div class="section-title-bar">
-          <div>
-            <h2 class="section-title">📋 每日教室日誌與聯絡簿工作單</h2>
-            <p class="section-subtitle">填寫今日 7 節課進度、隨堂作業、測驗與班務交代事項，支援一鍵產生 LINE 群通告與列印</p>
-          </div>
-          <div class="filter-group">
-            <button class="btn-secondary-action" id="btnAutoFillSchedule" title="抓取今天課表的科目與進度">
-              ⚡ 帶入今日課表
-            </button>
-            <button class="btn-primary-action" id="btnGenerateLineNotice" title="組裝並複製成 LINE 班群公告">
-              📢 產生 LINE 群公告
-            </button>
-            <button class="btn-secondary-action" id="btnPrintDailyLog" title="列印教室日誌格式單">
-              🖨️ 列印日誌
-            </button>
-          </div>
-        </div>
-
-        <!-- 日誌基本欄位 -->
-        <div class="daily-log-header-info">
-          <div class="form-group">
-            <label class="form-label">📅 日誌日期</label>
-            <input type="date" id="logDate" class="form-input">
-          </div>
-          <div class="form-group">
-            <label class="form-label">🌤️ 天氣狀況</label>
-            <input type="text" id="logWeather" class="form-input" placeholder="例如：☀️ 晴朗 / 🌧️ 微雨">
-          </div>
-          <div class="form-group">
-            <label class="form-label">👥 應到與實到人數</label>
-            <input type="text" id="logAbsent" class="form-input" placeholder="例如：應到42員，實到41員 (16號病假)">
-          </div>
-        </div>
-
-        <!-- 7 節課教學進度與作業表格 -->
-        <div class="table-responsive">
-          <table class="custom-table" id="dailyLogPeriodsTable">
-            <thead>
-              <tr>
-                <th style="width: 85px;">節次</th>
-                <th style="width: 140px;">科目名稱</th>
-                <th style="width: 100px;">任課老師</th>
-                <th>教學進度與教學重點</th>
-                <th style="width: 180px;">交代作業</th>
-                <th style="width: 130px;">隨堂測驗</th>
-                <th style="width: 90px;">課堂秩序</th>
-              </tr>
-            </thead>
-            <tbody id="dailyLogPeriodsBody">
-              <!-- JS 動態生成 -->
-            </tbody>
-          </table>
-        </div>
-
-        <!-- 導師交代事項與儲存按鈕 -->
-        <div class="form-group" style="margin-top: 1.25rem;">
-          <label class="form-label">📢 導師 / 幹部重要交代事項（將同步於 LINE 公告中）：</label>
-          <textarea id="logNotes" class="form-textarea" placeholder="例如：1. 明天第一節收會計習作 2. 放學前繳交校慶報名表..."></textarea>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
-          <button class="btn-primary-action" id="btnSaveDailyLog">
-            💾 儲存今日日誌內容
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==========================================================================
-         視圖 2: 📝 作業登記與催繳管理 (Homework Module)
-         ========================================================================== -->
-    <section class="view-section" id="view-homework">
-      <div class="glass-panel">
-        <div class="section-title-bar">
-          <div>
-            <h2 class="section-title">📝 作業登記與座號催繳管理</h2>
-            <p class="section-subtitle">點擊座號快速標記缺交、補交或請假，自動計算繳交率與缺交座號名單</p>
-          </div>
-          <button class="btn-primary-action" id="addHomeworkBtn">
-            ➕ 新增作業登記
-          </button>
-        </div>
-
-        <!-- 篩選與分類工具列 -->
-        <div class="hw-filter-bar">
-          <div class="filter-group">
-            <button class="hw-filter-btn active" data-filter="all">全部作業</button>
-            <button class="hw-filter-btn" data-filter="active">⏳ 催繳進行中</button>
-            <button class="hw-filter-btn" data-filter="completed">✅ 已全數繳齊</button>
+      <!-- ================= 1. 作業催繳登記 ================= -->
+      <section id="homeworkTab" class="tab-content active">
+        <div class="section-two-cols">
+          <!-- Left: 作業列表與新增 -->
+          <div class="panel hw-list-panel">
+            <div class="panel-header">
+              <h3>📚 今日收繳作業</h3>
+              <button id="openAddHwModalBtn" class="btn-primary btn-sm">＋ 新增作業</button>
+            </div>
+            
+            <div id="hwItemsList" class="hw-items-list">
+              <!-- Dynamically rendered -->
+            </div>
           </div>
 
-          <div class="filter-group">
-            <select id="hwSubjectFilter" class="form-select" style="width: auto;">
-              <option value="all">所有科目</option>
-              <option value="acc">📊 會計學 (周櫻)</option>
-              <option value="wordproc">⌨️ 文書處理 (藍淑雯)</option>
-              <option value="multimedia">🎬 多媒體製作 (翁偉倬)</option>
-              <option value="digitech">🖥️ 數位科技 (倪正平)</option>
-              <option value="infotech">💻 資訊科技 (倪正平)</option>
-              <option value="biz">📈 商業概論 (周櫻)</option>
-              <option value="math">📐 數學 (賴珮茹)</option>
-              <option value="chi">📖 國語文 (游新欣)</option>
-              <option value="eng">🔤 英語文 (陳瑀潔)</option>
-              <option value="physics">⚡ 物理 (劉仲平)</option>
-              <option value="art">🎨 美術 (黃浩軒)</option>
-              <option value="pe">⚽ 體育 (張鳴恩)</option>
-            </select>
+          <!-- Right: 31人繳交座號點選器 -->
+          <div class="panel hw-detail-panel">
+            <div id="noHwSelected" class="empty-state">
+              <span class="empty-icon">👈</span>
+              <p>請先由左側選擇或新增一項作業，開始登記 31 人繳交狀況！</p>
+            </div>
+
+            <div id="hwDetailContent" class="hw-detail-content hidden">
+              <div class="hw-detail-header">
+                <div>
+                  <h3 id="currentHwTitle">國文習作 P.20-22</h3>
+                  <span class="hw-subinfo" id="currentHwSubinfo">科目：國文 ｜ 期限：今日放學前</span>
+                </div>
+                <div class="hw-rate-box">
+                  <span class="hw-rate-num" id="currentHwRate">0%</span>
+                  <span class="hw-rate-label">已繳率 (<span id="currentHwCount">0</span>/31)</span>
+                </div>
+              </div>
+
+              <!-- 進度條 -->
+              <div class="progress-bar-bg">
+                <div id="hwProgressBar" class="progress-bar-fill" style="width: 0%;"></div>
+              </div>
+
+              <!-- 未交名單快捷複製盒 -->
+              <div class="unpaid-summary-box">
+                <div class="unpaid-info">
+                  <span class="badge-alert">⚠️ 未交 (<span id="unpaidCount">0</span> 人)：</span>
+                  <span id="unpaidListText" class="unpaid-list-text">無</span>
+                </div>
+                <div class="unpaid-actions">
+                  <button id="copyUnpaidBtn" class="btn-secondary btn-sm" title="複製未繳座號清單">📋 複製未交</button>
+                  <button id="markAllPaidBtn" class="btn-outline btn-sm">全班全交</button>
+                  <button id="markAllUnpaidBtn" class="btn-outline btn-sm">全部重設</button>
+                </div>
+              </div>
+
+              <!-- 31人座號快速切換方格 -->
+              <div class="student-picker-grid" id="hwStudentPickerGrid">
+                <!-- 1 ~ 31 buttons rendered by JS -->
+              </div>
+              <p class="picker-hint">💡 綠色代表「已交」，灰色代表「未交」，點擊號碼快速切換！</p>
+            </div>
           </div>
         </div>
+      </section>
 
-        <!-- 作業卡片清單列表 -->
-        <div class="hw-list-grid" id="homeworkListContainer">
-          <!-- JS 動態生成 -->
-        </div>
-      </div>
-    </section>
-
-    <!-- ==========================================================================
-         視圖 3: ⏰ 小考與段考倒數 (Exams Module)
-         ========================================================================== -->
-    <section class="view-section" id="view-exams">
-      <div class="glass-panel">
-        <div class="section-title-bar">
-          <div>
-            <h2 class="section-title">⏰ 考試排程與倒數衝刺</h2>
-            <p class="section-subtitle">記錄第一次段考、隨堂小考、模擬考範圍與小老師叮嚀，自動計算倒數天數</p>
+      <!-- ================= 2. 資處一仁正式課表 ================= -->
+      <section id="scheduleTab" class="tab-content">
+        <div class="panel schedule-panel">
+          <div class="panel-header">
+            <div>
+              <h3>🗓️ 115學年第1學期 資處一仁 正式課程表</h3>
+              <p class="subtitle" style="margin-top:0.3rem;">共 7 節課 ｜ 點選星期可快速切換今日焦點</p>
+            </div>
+            <div class="schedule-quick-actions">
+              <button id="highlightTodayBtn" class="btn-primary btn-sm">📍 標記今日課表</button>
+            </div>
           </div>
-          <button class="btn-primary-action" id="btnAddExam">
-            ➕ 新增測驗排程
-          </button>
-        </div>
 
-        <!-- 考試清單 -->
-        <div class="exams-grid" id="examsListContainer">
-          <!-- JS 動態生成 -->
-        </div>
-      </div>
-    </section>
-
-    <!-- ==========================================================================
-         視圖 4: 📅 課表與各科小老師 (Schedule & Assistants)
-         ========================================================================== -->
-    <section class="view-section" id="view-schedule">
-      <div class="glass-panel">
-        <div class="section-title-bar">
-          <div>
-            <h2 class="section-title">📅 週一至週五 班級課表與小老師名冊</h2>
-            <p class="section-subtitle">點擊任一節課表可即時修改科目或備註；右側為各科小老師對應名冊</p>
-          </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;" class="schedule-layout-grid">
-          <!-- 課表格線 -->
           <div class="table-responsive">
             <table class="schedule-table">
               <thead>
                 <tr>
-                  <th style="width: 100px;">節次 / 時間</th>
-                  <th>週一</th>
-                  <th>週二</th>
-                  <th>週三</th>
-                  <th>週四</th>
-                  <th>週五</th>
+                  <th width="140">次節 / 時間</th>
+                  <th class="day-col" data-day="1">週一</th>
+                  <th class="day-col" data-day="2">週二</th>
+                  <th class="day-col" data-day="3">週三</th>
+                  <th class="day-col" data-day="4">週四</th>
+                  <th class="day-col" data-day="5">週五</th>
                 </tr>
               </thead>
               <tbody id="scheduleTableBody">
-                <!-- JS 動態生成 -->
+                <!-- Rendered dynamically or static with nice chips -->
               </tbody>
             </table>
           </div>
+        </div>
+      </section>
 
+      <!-- ================= 3. 電子黑板 / 聯絡簿投影 ================= -->
+      <section id="boardTab" class="tab-content">
+        <div class="blackboard-wrapper">
+          <div class="blackboard-frame">
+            <div class="board-header">
+              <div class="board-date" id="boardDate">2026/09/17 (四) 資處一仁 聯絡簿公告</div>
+              <div class="board-motto">書山有路勤為徑，學海無涯苦作舟</div>
+            </div>
+
+            <div class="board-grid">
+              <!-- 今日作業 -->
+              <div class="board-column">
+                <div class="board-col-title">📖 今日作業</div>
+                <div id="boardHwList" class="board-list">
+                  <!-- Generated from Homework Tracker -->
+                </div>
+              </div>
+
+              <!-- 明日考試 -->
+              <div class="board-column">
+                <div class="board-col-title">✍️ 明日小考與測驗</div>
+                <div id="boardExamList" class="board-list">
+                  <!-- Generated from exams -->
+                </div>
+                <button id="addExamPromptBtn" class="board-add-btn">＋ 新增考試項目</button>
+              </div>
+
+              <!-- 注意事項與攜帶物品 -->
+              <div class="board-column">
+                <div class="board-col-title">📌 攜帶物品與注意事項</div>
+                <div id="boardNoteList" class="board-list">
+                  <!-- Generated from notes -->
+                </div>
+                <button id="addNotePromptBtn" class="board-add-btn">＋ 新增注意事項</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 4. 教室日誌小幫手 ================= -->
+      <section id="logTab" class="tab-content">
+        <div class="panel log-panel">
+          <div class="panel-header">
+            <div>
+              <h3>📋 教室日誌快速填報小幫手</h3>
+              <p class="subtitle" style="margin-top:0.25rem;">支援一鍵套用資處一仁當日課表，省去重複手寫科目與老師！</p>
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button id="autoFillLogFromScheduleBtn" class="btn-secondary btn-sm">⚡ 帶入今日課表</button>
+              <button id="copyLogSheetBtn" class="btn-primary btn-sm">📋 一鍵複製全天日誌文字</button>
+            </div>
+          </div>
+
+          <!-- 日誌頂部概況 -->
+          <div class="log-meta-card">
+            <div class="meta-item">
+              <label>填寫日期：</label>
+              <input type="date" id="logDateInput">
+            </div>
+            <div class="meta-item">
+              <label>套用星期課表：</label>
+              <select id="logWeekdaySelect">
+                <option value="1">星期一 課表</option>
+                <option value="2">星期二 課表</option>
+                <option value="3">星期三 課表</option>
+                <option value="4">星期四 課表</option>
+                <option value="5">星期五 課表</option>
+              </select>
+            </div>
+            <div class="meta-item">
+              <label>全班人數：</label>
+              <input type="number" id="logTotalCount" value="31" readonly>
+            </div>
+            <div class="meta-item">
+              <label>請假缺席座號：</label>
+              <input type="text" id="logAbsentInput" placeholder="例：3, 14 號 (病假)">
+            </div>
+            <div class="meta-item">
+              <label>學藝股長簽名：</label>
+              <input type="text" id="logOfficerName" placeholder="填寫你的名字/座號">
+            </div>
+          </div>
+
+          <!-- 課堂節次登記表 -->
+          <div class="table-responsive">
+            <table class="log-table">
+              <thead>
+                <tr>
+                  <th width="90">節次</th>
+                  <th width="120">科目</th>
+                  <th width="120">任課教師</th>
+                  <th>教學進度摘要</th>
+                  <th>作業交代 / 課堂表現備註</th>
+                </tr>
+              </thead>
+              <tbody id="logTableBody">
+                <!-- 1 ~ 8 periods -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 4. 課堂抽籤 / 點名 ================= -->
+      <section id="lotteryTab" class="tab-content">
+        <div class="lottery-card">
+          <div class="display-stage">
+            <div id="winnerDisplay" class="winner-display">
+              <span class="ready-text">課堂提問準備抽籤</span>
+            </div>
+            <div id="subWinnerList" class="sub-winner-list"></div>
+          </div>
+
+          <div class="lottery-controls">
+            <div class="control-row">
+              <div class="control-item">
+                <label for="pickCount">抽取人數：</label>
+                <div class="number-input-group">
+                  <button type="button" class="btn-step" id="decreasePickBtn">-</button>
+                  <input type="number" id="pickCount" min="1" max="31" value="1">
+                  <button type="button" class="btn-step" id="increasePickBtn">+</button>
+                </div>
+              </div>
+              <div class="control-item">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="noRepeatCheck" checked>
+                  <span>不重複抽籤（已抽中排除）</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <button id="startLotteryBtn" class="btn-primary btn-large">
+                <span>✨</span> 開始抽籤
+              </button>
+              <button id="resetLotteryPoolBtn" class="btn-secondary">
+                🔄 重置抽籤池 (<span id="remainingPoolCount">31</span>/31)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 31人座號卡片檢視 -->
+        <div class="mini-grid-container">
+          <h4 class="sub-section-title">全班 1 ~ 31 號課堂狀態</h4>
+          <div id="studentGrid" class="student-grid">
+            <!-- 1 to 31 cards -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 5. 座號與各科小老師 ================= -->
+      <section id="staffTab" class="tab-content">
+        <div class="section-two-cols">
           <!-- 各科小老師名冊 -->
-          <div>
-            <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">
-              <span>🧑‍🎓</span> 各科小老師通訊錄
-            </h3>
-            <div class="assistants-grid" id="assistantsListContainer">
-              <!-- JS 動態生成 -->
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==========================================================================
-         視圖 5: ✨ 黑板金句 & 教室佈置 (Quotes & Bulletin)
-         ========================================================================== -->
-    <section class="view-section" id="view-quotes">
-      <!-- 擬真木框黑板展示區 -->
-      <div class="chalkboard-container">
-        <span class="chalkboard-badge" id="chalkboardQuoteCategory">會計金句</span>
-        <div class="chalkboard-quote" id="chalkboardQuoteText">
-          「借貸必相等，人生亦有平衡；付出多少努力，產出多少資產。」
-        </div>
-        <div class="chalkboard-author" id="chalkboardQuoteAuthor">
-          —— 資處一仁學藝語錄
-        </div>
-
-        <div class="chalkboard-actions">
-          <button class="btn-primary-action" id="btnNextQuote">🎲 隨機抽下一句</button>
-          <button class="btn-secondary-action" id="btnSetAsDailyQuote">📌 設為今日日誌金句</button>
-          <button class="btn-secondary-action" id="btnCopyQuote">📋 複製金句</button>
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.5rem;">
-        <!-- 金句庫管理 -->
-        <div class="glass-panel">
-          <div class="section-title-bar">
-            <h3 class="section-title">📚 黑板金句語錄庫</h3>
-          </div>
-
-          <!-- 新增金句表單 -->
-          <form id="addQuoteForm" style="display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1rem;">
-            <input type="text" id="newQuoteText" class="form-input" placeholder="輸入名言佳句或程式梗..." required>
-            <div style="display: flex; gap: 0.6rem;">
-              <input type="text" id="newQuoteAuthor" class="form-input" placeholder="作者/來源 (例如：愛因斯坦)">
-              <input type="text" id="newQuoteCategory" class="form-input" placeholder="分類 (例如：勵志)">
-              <button type="submit" class="btn-primary-action" style="white-space: nowrap;">➕ 加入語錄</button>
-            </div>
-          </form>
-
-          <div class="table-responsive" style="max-height: 320px; overflow-y: auto;">
-            <table class="custom-table">
-              <thead>
-                <tr>
-                  <th style="width: 80px;">分類</th>
-                  <th>金句內容</th>
-                  <th style="width: 100px;">出處</th>
-                  <th style="width: 90px;">操作</th>
-                </tr>
-              </thead>
-              <tbody id="quotesTableBody">
-                <!-- JS 生成 -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- 教室佈置與壁報競賽進度 -->
-        <div class="glass-panel">
-          <div class="section-title-bar">
-            <div>
-              <h3 class="section-title">🎨 壁報競賽與教室佈置</h3>
-              <p class="section-subtitle">追蹤壁報、藝文投稿與佈告欄進度</p>
-            </div>
-            <button class="btn-text-action" id="btnAddBulletinTask">➕ 新增任務</button>
-          </div>
-
-          <div id="bulletinTasksContainer" style="display: flex; flex-direction: column; gap: 0.75rem;">
-            <!-- JS 生成 -->
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==========================================================================
-         視圖 6: 👥 座號名冊與系統設定 (Roster & Settings)
-         ========================================================================== -->
-    <section class="view-section" id="view-roster">
-      <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 1.5rem;">
-        
-        <!-- 全班學生座號名冊 -->
-        <div class="glass-panel">
-          <div class="section-title-bar">
-            <div>
-              <h2 class="section-title">👥 全班座號與學生名冊</h2>
-              <p class="section-subtitle">可修改姓名，或點擊「缺交明細」檢視該座號同學目前所有未交作業</p>
-            </div>
-            <button class="btn-secondary-action" id="btnBatchImportRoster">
-              📋 批量貼上匯入名單
-            </button>
-          </div>
-
-          <div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
-            <table class="custom-table">
-              <thead>
-                <tr>
-                  <th style="width: 70px;">座號</th>
-                  <th>學生姓名</th>
-                  <th>職務備註</th>
-                  <th style="width: 120px;">催繳狀態</th>
-                  <th style="width: 95px;">明細</th>
-                </tr>
-              </thead>
-              <tbody id="rosterTableBody">
-                <!-- JS 動態生成 -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- 班級資訊設定與備份還原 -->
-        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-          
-          <div class="glass-panel">
-            <div class="section-title-bar">
-              <h3 class="section-title">⚙️ 班級基本設定</h3>
-            </div>
-            <form id="classSettingsForm">
-              <div class="form-group">
-                <label class="form-label">班級簡稱</label>
-                <input type="text" id="cfgClassName" class="form-input" value="資處一仁" required>
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>🏅 資處一仁 各科小老師名單 (共 19 科)</h3>
+                <p class="subtitle" style="margin-top:0.25rem;">依正式課表排列 ｜ 可填寫 1~31 號或同學姓名</p>
               </div>
-              <div class="form-group">
-                <label class="form-label">班級全名</label>
-                <input type="text" id="cfgFullName" class="form-input" value="資料處理科 一年仁班">
-              </div>
-              <div class="form-row-2">
-                <div class="form-group">
-                  <label class="form-label">學期年度</label>
-                  <input type="text" id="cfgSchoolYear" class="form-input" value="114學年度 第一學期">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">全班座號人數</label>
-                  <input type="number" id="cfgSeatCount" class="form-input" min="10" max="60" value="42" required>
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">學藝股長與幹部姓名</label>
-                <input type="text" id="cfgCadre" class="form-input" value="陳學藝 / 張班長">
-              </div>
-              <button type="submit" class="btn-primary-action" style="width: 100%;">
-                💾 儲存班級設定
-              </button>
-            </form>
-          </div>
-
-          <div class="glass-panel">
-            <div class="section-title-bar">
-              <h3 class="section-title">📦 資料備份與安全性</h3>
+              <button id="saveAssistantsBtn" class="btn-primary btn-sm">💾 儲存名單</button>
             </div>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
-              本系統所有資料皆自動儲存於您的瀏覽器本機端。更換手機或電腦時，請先匯出備份 JSON 檔。
-            </p>
-            <div style="display: flex; flex-direction: column; gap: 0.6rem;">
-              <button class="btn-primary-action" id="btnExportBackup">
-                📥 匯出完整備份檔 (JSON)
-              </button>
-              
-              <label class="btn-secondary-action" style="cursor: pointer; text-align: center;">
-                📤 還原備份檔 (.json)
-                <input type="file" id="backupFileInput" accept=".json" style="display: none;">
-              </label>
-
-              <button class="btn-text-action" id="btnResetDefaults" style="color: #f87171; margin-top: 0.5rem;">
-                ⚠️ 回復初始預設資料 (清除所有自訂)
-              </button>
+            <div class="assistants-grid" id="assistantsGrid">
+              <!-- Rendered by JS -->
             </div>
           </div>
 
+          <!-- 31位同學座號備註管理 -->
+          <div class="panel">
+            <div class="panel-header">
+              <h3>📋 31 位同學座號名冊與備註</h3>
+              <button id="resetNamesToPureNumbersBtn" class="btn-outline btn-sm">還原為純 1~31 號</button>
+            </div>
+            <div class="student-roster-list" id="studentRosterList">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
         </div>
+      </section>
+    </main>
 
-      </div>
-    </section>
-
-  </div> <!-- /app-container -->
-
-  <!-- ==========================================================================
-       所有模態視窗 (Modals)
-       ========================================================================== -->
-
-  <!-- Modal 1: 新增/編輯作業 -->
-  <div class="modal-overlay" id="homeworkModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 id="homeworkModalTitle">新增作業項目</h3>
-        <button class="modal-close-btn" onclick="HomeworkModule.closeModal()">✕</button>
-      </div>
-      <form id="homeworkForm">
+    <!-- Modal: 新增作業 -->
+    <div id="addHwModal" class="modal-overlay hidden">
+      <div class="modal-window">
+        <div class="modal-header">
+          <h3>📝 新增收繳作業項目</h3>
+          <button id="closeAddHwModalBtn" class="btn-close">&times;</button>
+        </div>
         <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label">作業名稱 *</label>
-            <input type="text" name="hwTitle" class="form-input" placeholder="例如：會計學習作 Ch2 借貸分錄" required>
+          <div class="modal-field">
+            <label for="newHwSubject">科目：</label>
+            <select id="newHwSubject">
+              <option value="國語文/中文">國語文 / 中文</option>
+              <option value="數學">數學</option>
+              <option value="會計">會計</option>
+              <option value="商業概論">商業概論</option>
+              <option value="文書處理實習">文書處理實習</option>
+              <option value="多媒體製作與應用">多媒體製作與應用</option>
+              <option value="數位科技概論">數位科技概論</option>
+              <option value="資訊科技">資訊科技</option>
+              <option value="物理">物理</option>
+              <option value="生命教育概論">生命教育概論</option>
+              <option value="全民國防教育">全民國防教育</option>
+              <option value="閩南文">閩南文</option>
+              <option value="其他">其他</option>
+            </select>
           </div>
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">所屬科目</label>
-              <select name="hwSubject" id="hwSubject" class="form-select">
-                <!-- JS 生成 -->
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">作業類別</label>
-              <select name="hwType" class="form-select">
-                <option value="workbook">習作本</option>
-                <option value="handout">講義作業</option>
-                <option value="project">程式上機</option>
-                <option value="report">專題報告</option>
-                <option value="quiz_review">考卷訂正</option>
-                <option value="other">其他作業</option>
-              </select>
-            </div>
+          <div class="modal-field">
+            <label for="newHwTitle">作業名稱 / 範圍：</label>
+            <input type="text" id="newHwTitle" placeholder="例：習作 P.15-18 或 講義第 3 單元">
           </div>
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">繳交截止日</label>
-              <input type="date" name="hwDueDate" class="form-input" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">收繳對象 (小老師)</label>
-              <input type="text" name="hwRecipient" class="form-input" placeholder="例如：會計小老師（5號）">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">作業備註與規範</label>
-            <textarea name="hwDesc" class="form-textarea" placeholder="例如：需用藍黑筆書寫、上機程式需壓縮成 zip..."></textarea>
+          <div class="modal-field">
+            <label for="newHwDeadline">繳交期限：</label>
+            <input type="text" id="newHwDeadline" placeholder="例：今日放學前、明日早自習">
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn-secondary-action" onclick="HomeworkModule.closeModal()">取消</button>
-          <button type="submit" class="btn-primary-action">儲存作業</button>
+          <button id="confirmAddHwBtn" class="btn-primary">確認建立</button>
         </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal 2: LINE 班群公告組裝視窗 -->
-  <div class="modal-overlay" id="lineNoticeModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>📢 班級 LINE 群每日通告產生器</h3>
-        <button class="modal-close-btn" onclick="document.getElementById('lineNoticeModal').classList.remove('is-active')">✕</button>
-      </div>
-      <div class="modal-body">
-        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
-          已為您自動彙整今日進度、明日課表、催繳作業與黑板金句，可直接修改內容或一鍵複製：
-        </p>
-        <textarea id="lineNoticeContent" class="form-textarea" style="height: 300px; font-family: var(--font-mono); font-size: 0.88rem;"></textarea>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn-secondary-action" onclick="document.getElementById('lineNoticeModal').classList.remove('is-active')">關閉</button>
-        <button type="button" class="btn-primary-action" id="btnCopyLineNotice">📋 一鍵複製到剪貼簿</button>
       </div>
     </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
   </div>
 
-  <!-- Modal 3: 新增/編輯考試與段考 -->
-  <div class="modal-overlay" id="examModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 id="examModalTitle">新增測驗 / 段考排程</h3>
-        <button class="modal-close-btn" onclick="ExamsModule.closeModal()">✕</button>
-      </div>
-      <form id="examForm">
-        <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label">考試名稱 *</label>
-            <input type="text" name="examTitle" class="form-input" placeholder="例如：高一上 第一次期中定期評量" required>
-          </div>
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">測驗類型</label>
-              <select name="examType" class="form-select">
-                <option value="major">段考定期評量</option>
-                <option value="quiz">隨堂小考</option>
-                <option value="mock">模擬考</option>
-                <option value="weekly">每週週考</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">考試開始日期</label>
-              <input type="date" name="examStartDate" class="form-input" required>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">結束日期 (單日考試請填同天)</label>
-            <input type="date" name="examEndDate" class="form-input">
-          </div>
-          <div class="form-group">
-            <label class="form-label">考試範圍 (格式：科目代碼: 範圍文字，一行一科)</label>
-            <textarea name="examScopeRaw" class="form-textarea" placeholder="acc: 第一章至第二章分錄&#10;prog: 單元1~3 條件判斷&#10;math: 直線方程式全"></textarea>
-          </div>
-          <div class="form-group">
-            <label class="form-label">小老師與學藝提醒備註</label>
-            <textarea name="examNotes" class="form-textarea" placeholder="例如：自備簡易計算機、考試時間 45 分鐘..."></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn-secondary-action" onclick="ExamsModule.closeModal()">取消</button>
-          <button type="submit" class="btn-primary-action">儲存考試排程</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal 4: 編輯單節課表 -->
-  <div class="modal-overlay" id="scheduleEditModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 id="scheduleEditTitle">修改課表</h3>
-        <button class="modal-close-btn" onclick="document.getElementById('scheduleEditModal').classList.remove('is-active')">✕</button>
-      </div>
-      <form id="scheduleEditForm">
-        <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label">上課科目</label>
-            <select name="schedEditSubject" id="schedEditSubject" class="form-select"></select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">上課地點 / 教室</label>
-            <input type="text" name="schedEditRoom" class="form-input" placeholder="例如：班級教室 / 電三電腦教室">
-          </div>
-          <div class="form-group">
-            <label class="form-label">課程備註 / 攜帶物品</label>
-            <input type="text" name="schedEditNote" class="form-input" placeholder="例如：攜帶隨身碟、請換體育服">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn-secondary-action" onclick="document.getElementById('scheduleEditModal').classList.remove('is-active')">取消</button>
-          <button type="submit" class="btn-primary-action">儲存課表</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal 5: 編輯小老師資訊 -->
-  <div class="modal-overlay" id="assistantEditModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 id="asstModalTitle">編輯小老師資訊</h3>
-        <button class="modal-close-btn" onclick="document.getElementById('assistantEditModal').classList.remove('is-active')">✕</button>
-      </div>
-      <form id="assistantEditForm">
-        <input type="hidden" name="asstSubjectId" id="asstSubjectId">
-        <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label">任課老師姓名</label>
-            <input type="text" name="asstTeacher" id="asstTeacher" class="form-input" required>
-          </div>
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">小老師座號</label>
-              <input type="number" name="asstSeat" id="asstSeat" class="form-input" min="1" max="60" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">小老師姓名</label>
-              <input type="text" name="asstName" id="asstName" class="form-input" required>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn-secondary-action" onclick="document.getElementById('assistantEditModal').classList.remove('is-active')">取消</button>
-          <button type="submit" class="btn-primary-action">儲存小老師</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal 6: 學生個別缺交作業檢視 -->
-  <div class="modal-overlay" id="studentInspectModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 id="inspectStudentTitle">學生缺交作業總覽</h3>
-        <button class="modal-close-btn" onclick="document.getElementById('studentInspectModal').classList.remove('is-active')">✕</button>
-      </div>
-      <div class="modal-body" id="inspectStudentContent">
-        <!-- JS 動態生成 -->
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn-primary-action" onclick="document.getElementById('studentInspectModal').classList.remove('is-active')">確定</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal 7: 批量匯入學生名單 -->
-  <div class="modal-overlay" id="batchImportModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>📋 批量匯入學生名冊</h3>
-        <button class="modal-close-btn" onclick="document.getElementById('batchImportModal').classList.remove('is-active')">✕</button>
-      </div>
-      <form id="batchImportForm">
-        <div class="modal-body">
-          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
-            請每行貼上一位同學姓名（可直接貼上「1 王小明」或「王小明」，系統將自動依序編排座號）：
-          </p>
-          <textarea id="batchImportText" class="form-textarea" style="height: 240px;" placeholder="張班長&#10;李副班&#10;王學藝&#10;趙風紀..."></textarea>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn-secondary-action" onclick="document.getElementById('batchImportModal').classList.remove('is-active')">取消</button>
-          <button type="submit" class="btn-primary-action">開始匯入</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal 8: 新增壁報/競賽任務 -->
-  <div class="modal-overlay" id="bulletinTaskModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>🎨 新增壁報與競賽任務</h3>
-        <button class="modal-close-btn" onclick="document.getElementById('bulletinTaskModal').classList.remove('is-active')">✕</button>
-      </div>
-      <form id="bulletinTaskForm">
-        <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label">活動/壁報名稱 *</label>
-            <input type="text" name="taskTitle" class="form-input" placeholder="例如：校慶特色壁報比賽" required>
-          </div>
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">截止交件日期</label>
-              <input type="date" name="taskDeadline" class="form-input" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">負責同學 / 股長</label>
-              <input type="text" name="taskLeader" class="form-input" value="學藝股長">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">目前完成進度 (%)</label>
-            <input type="number" name="taskProgress" class="form-input" min="0" max="100" value="10">
-          </div>
-          <div class="form-group">
-            <label class="form-label">注意事項與分配工作</label>
-            <textarea name="taskNotes" class="form-textarea" placeholder="例如：負責繪圖、排版、材料採購..."></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn-secondary-action" onclick="document.getElementById('bulletinTaskModal').classList.remove('is-active')">取消</button>
-          <button type="submit" class="btn-primary-action">建立任務</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- 全域 Toast 容器 -->
-  <div class="toast-container" id="toastContainer"></div>
-
-  <!-- JavaScript 腳本依序載入 -->
-  <script src="js/data.js"></script>
-  <script src="js/audio.js"></script>
-  <script src="js/store.js"></script>
-  <script src="js/modules/dailyLog.js"></script>
-  <script src="js/modules/homework.js"></script>
-  <script src="js/modules/exams.js"></script>
-  <script src="js/modules/schedule.js"></script>
-  <script src="js/modules/quotes.js"></script>
-  <script src="js/modules/roster.js"></script>
-  <script src="js/app.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>
